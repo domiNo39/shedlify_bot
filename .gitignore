@@ -3,3 +3,12 @@
 ################################################################################
 
 /Schedlify_tg/Schedlify_tg/.env
+/Schedlify_tg/Schedlify_tg/bin
+/Schedlify_tg/Schedlify_tg/obj
+*.json
+*.bin
+*.vsidx
+*.v2
+*.suo
+*.wsuo
+/Schedlify_tg/Schedlify_tg/Bot.cs
