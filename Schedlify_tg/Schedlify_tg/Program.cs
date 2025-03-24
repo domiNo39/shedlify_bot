@@ -1,2 +1,12 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿// Program.cs
+namespace Schedlify_tg
+{
+    public class Program
+    {
+        public static async Task Main()
+        {
+            Bot bot = new Bot();
+            await bot.StartReceiving();
+        }
+    }
+}
