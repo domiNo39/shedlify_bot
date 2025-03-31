@@ -4,7 +4,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using dotenv.net;
 
-DotEnv.Load(new DotEnvOptions(true,new List<string> { "../../../.env"}));
+DotEnv.Load(new DotEnvOptions(true, ["../../../.env"]));
 var botToken = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN");
 if (string.IsNullOrEmpty(botToken))
 {
@@ -25,12 +25,55 @@ Console.ReadLine();
 
 async Task OnMessage(Message msg, UpdateType type)
 {
-    if (msg.Text == "/start")
+    ApiClient apiClient = new ApiClient();
+    switch (msg.Text)
     {
-        await botClient.SendMessage(msg.Chat, "Welcome! Pick one direction",
-            replyMarkup: new InlineKeyboardMarkup(new List<InlineKeyboardButton> { new InlineKeyboardButton("обрати групу", "choose_university") }));
+        case "/start":
+            await botClient.SendMessage(
+                msg.Chat,
+                "Привіт, я чат-бот Schedlify\nЩоб розпочати роботу оберіть вашу групу",
+                replyMarkup: new InlineKeyboardMarkup(new List<InlineKeyboardButton> { new InlineKeyboardButton("Обрати університет", "choose_university") })
+            );
+            if (msg.From is not null)
+            {
+                await apiClient.PostAsync<TgUser>(
+                "/tgusers",
+                msg.From.Id, new TgUserBase
+                {
+                    FirstName = msg.From.FirstName,
+                    LastName = msg.From.LastName,
+                    Username = msg.From.Username
+                }
+                );
+            }
+            
+            break;
+        case "/subscribe":
+            if (msg.From is not null)
+            {
+                TgUser user = await apiClient.PostAsync<TgUser>(
+                "/tgusers/change_subscription_status",
+                msg.From.Id,
+                new Dictionary<string, object>()
+                );
+                string message;
+                if (user.Subscribed)
+                {
+                    message = "Ви успішно підписались";
+                }
+                else
+                {
+                    message = "Ви успішно відписались";
+                }
+                await botClient.SendMessage(
+                    msg.Chat,
+                    message
+                );
+            }
+            break;
 
     }
+
 }
 
 async Task OnUpdate(Update update)
