@@ -21,7 +21,7 @@ using var cts = new CancellationTokenSource();
 
 var me = await botClient.GetMe();
 Console.WriteLine($"Бот @{me.Username} запущений!");
-Console.ReadLine(); 
+Console.ReadLine();
 
 async Task OnMessage(Message msg, UpdateType type)
 {
@@ -89,9 +89,15 @@ async Task OnUpdate(Update update)
             case "chosen_university":
                 startMenu.ShowDepartmentChooseList(query.From.Id, int.Parse(query.Data.Split(',')[1]));
                 break;
+
+            case "chosen_group":
+                startMenu.ShowGroupChooseList(query.From.Id, int.Parse(query.Data.Split(',')[1]));
+                break;
         }
         await botClient.AnswerCallbackQuery(query.Id);
 
 
     }
 }
+
+

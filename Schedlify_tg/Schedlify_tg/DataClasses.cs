@@ -20,3 +20,23 @@ public class TgUser
 
     public bool Subscribed { get; set; }
 }
+
+public class University
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+}
+
+public class Department
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public int UniversityId { get; set; }
+}
+
+public class Group
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public int DepartmentId { get; set; }
+}
