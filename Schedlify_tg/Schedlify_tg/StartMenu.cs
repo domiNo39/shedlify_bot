@@ -58,4 +58,21 @@ public class StartMenu
 
         await _botClient.SendMessage(userId, "Виберіть групу", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
+
+    public async void ShowGroupChosen(long userId, int groupId)
+    {
+        List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
+       
+        Group group = await _apiClient.GetAsync<Group>($"/groups/{groupId}", userId);
+        buttonList.Add(new List<InlineKeyboardButton> { 
+            new InlineKeyboardButton("Підписатись", "subscribe"), 
+            new InlineKeyboardButton("Переглянути розклад", "show")});
+
+        await _botClient.SendMessage(userId, $"Ви обрали групу {group.Name}", replyMarkup: new InlineKeyboardMarkup(buttonList));
+    }
+
+    public async void ShowSchedule(long userId)
+    {
+
+    }
 }
