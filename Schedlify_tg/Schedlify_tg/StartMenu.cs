@@ -59,19 +59,20 @@ public class StartMenu
     public async void ShowGroupChosen(long userId, int groupId)
     {
         List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
-        Dictionary<string, string> _params = new Dictionary<string, string>();
-        _params.Add("GroupId", $"{groupId}");
+        
         Group group = await _apiClient.GetAsync<Group>($"/groups/{groupId}", userId);
-        TgUser user = await _apiClient.PostAsync<TgUser>("/select_group", userId, _params);
+        TgUser user = await _apiClient.PostAsync<TgUser>($"/tgusers/groups/{groupId}", userId, new Dictionary<string, string>());
         buttonList.Add(new List<InlineKeyboardButton> {
             new InlineKeyboardButton("Підписатись", "subscribe"),
-            new InlineKeyboardButton("Переглянути розклад", "show")});
+            new InlineKeyboardButton("Переглянути розклад", "show,0")});
 
         await _botClient.SendMessage(userId, $"Ви обрали групу {group.Name}", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
 
-    public async void ShowSchedule(long userId)
+    public async void ShowSchedule(long userId, DateOnly date)
     {
+        DateTime dateTime = DateTime.Now;
+        int a = DateOnly.FromDateTime(dateTime).DayNumber - date.DayNumber;
         List<Assignment> assignmentList = new List<Assignment>();
         List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
 
@@ -81,6 +82,11 @@ public class StartMenu
 
         }
 
+        buttonList.Add(new List<InlineKeyboardButton>
+        {
+            new InlineKeyboardButton("<-", $"show,{a-1}"),
+            new InlineKeyboardButton("->", $"show,{a+1}")
+        });
         await _botClient.SendMessage(userId, $"Розклад на ", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
 }

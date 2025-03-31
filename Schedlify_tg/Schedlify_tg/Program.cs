@@ -124,7 +124,8 @@ async Task OnUpdate(Update update)
                 break;
 
             case "show":
-                startMenu.ShowSchedule(query.From.Id);
+
+                startMenu.ShowSchedule(query.From.Id, DateOnly.FromDateTime(DateTime.Now).AddDays(int.Parse(query.Data.Split(',')[1])));
                 break;
         }
         await botClient.AnswerCallbackQuery(query.Id,query.Data);
