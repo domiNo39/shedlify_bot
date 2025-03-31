@@ -90,11 +90,11 @@ async Task OnUpdate(Update update)
                 startMenu.ShowDepartmentChooseList(query.From.Id, int.Parse(query.Data.Split(',')[1]));
                 break;
 
-            case "chosen_group":
+            case "chosen_department":
                 startMenu.ShowGroupChooseList(query.From.Id, int.Parse(query.Data.Split(',')[1]));
                 break;
         }
-        await botClient.AnswerCallbackQuery(query.Id);
+        await botClient.AnswerCallbackQuery(query.Id,query.Data);
 
 
     }
