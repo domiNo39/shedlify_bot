@@ -80,6 +80,7 @@ async Task OnUpdate(Update update)
 {
     if (update is { CallbackQuery: { } query } and)
     {
+        ApiClient apiClient = new ApiClient();
         switch (query.Data.Split(',')[0])
         {
             case "choose_university":
@@ -96,6 +97,34 @@ async Task OnUpdate(Update update)
 
             case "chosen_group":
                 startMenu.ShowGroupChosen(query.From.Id, int.Parse(query.Data.Split(',')[1]));
+                break;
+
+            case "subscribe":
+                if (query.From is not null)
+                {
+                    TgUser user = await apiClient.PostAsync<TgUser>(
+                    "/change_subscription_status",
+                    query.From.Id,
+                    new Dictionary<string, object>()
+                    );
+                    string message;
+                    if (user.Subscribed)
+                    {
+                        message = "Ви успішно підписались";
+                    }
+                    else
+                    {
+                        message = "Ви успішно відписались";
+                    }
+                    await botClient.SendMessage(
+                        query.From.Id,
+                        message
+                    );
+                }
+                break;
+
+            case "show":
+                startMenu.ShowSchedule(query.From.Id);
                 break;
         }
         await botClient.AnswerCallbackQuery(query.Id,query.Data);

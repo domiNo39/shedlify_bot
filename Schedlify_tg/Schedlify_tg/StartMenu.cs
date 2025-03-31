@@ -1,26 +1,23 @@
-﻿using Telegram.Bot;
+﻿using System.Text.RegularExpressions;
+using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 
 public class StartMenu
 {
     private readonly ITelegramBotClient _botClient;
-    private List<University> _universities;
-    private List<Department> _departments;
-    private List<Group> _groups;
     private ApiClient _apiClient;
 
     public StartMenu(ITelegramBotClient botClient)
     {
         _botClient = botClient;
         _apiClient = new ApiClient();
-        _departments = new List<Department>();
-        _groups = new List<Group>();
+  
     }
 
     public async void ShowUniversityChooseList(long userId)
     {
         List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
-        _universities = await _apiClient.GetAsync<List<University>>("/universities", userId);
+        List<University> _universities = await _apiClient.GetAsync<List<University>>("/universities", userId);
         foreach (University uni in _universities)
         {
             buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton(uni.Name, $"chosen_university,{uni.Id}") });
@@ -34,7 +31,7 @@ public class StartMenu
         List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
         Dictionary<string, string> _params = new Dictionary<string, string>();
         _params.Add("universityId", $"{universityId}");
-        _departments = await _apiClient.GetAsync<List<Department>>("/departments", userId, _params);
+        List<Department> _departments = await _apiClient.GetAsync<List<Department>>("/departments", userId, _params);
         foreach (Department dep in _departments)
         {
             buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton(dep.Name, $"chosen_department,{dep.Id}") });
@@ -49,7 +46,7 @@ public class StartMenu
         List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
         Dictionary<string, string> _params = new Dictionary<string, string>();
         _params.Add("departmentId", $"{departmentId}" );
-        _groups = await _apiClient.GetAsync<List<Group>>("/groups", userId, _params);
+        List<Group> _groups = await _apiClient.GetAsync<List<Group>>("/groups", userId, _params);
         foreach (Group group in _groups)
         {
             buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton(group.Name, $"chosen_group,{group.Id}") });
@@ -62,10 +59,12 @@ public class StartMenu
     public async void ShowGroupChosen(long userId, int groupId)
     {
         List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
-       
+        Dictionary<string, string> _params = new Dictionary<string, string>();
+        _params.Add("GroupId", $"{groupId}");
         Group group = await _apiClient.GetAsync<Group>($"/groups/{groupId}", userId);
-        buttonList.Add(new List<InlineKeyboardButton> { 
-            new InlineKeyboardButton("Підписатись", "subscribe"), 
+        TgUser user = await _apiClient.PostAsync<TgUser>("/select_group", userId, _params);
+        buttonList.Add(new List<InlineKeyboardButton> {
+            new InlineKeyboardButton("Підписатись", "subscribe"),
             new InlineKeyboardButton("Переглянути розклад", "show")});
 
         await _botClient.SendMessage(userId, $"Ви обрали групу {group.Name}", replyMarkup: new InlineKeyboardMarkup(buttonList));
@@ -73,6 +72,16 @@ public class StartMenu
 
     public async void ShowSchedule(long userId)
     {
+        List<Assignment> assignmentList = new List<Assignment>();
+        List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
 
+        foreach (Assignment assignment in assignmentList)
+        {
+            buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton($"{assignment.StartTime}: {assignment.ClassId}", $"show,{assignment.Id}") });
+
+        }
+
+        await _botClient.SendMessage(userId, $"Розклад на ", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
 }
+
