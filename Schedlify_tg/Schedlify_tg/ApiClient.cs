@@ -1,13 +1,21 @@
-﻿using Newtonsoft.Json;
+﻿using dotenv.net;
+using Newtonsoft.Json;
 
 public class ApiClient
 {
     private readonly string _baseUrl;
     private readonly HttpClient _httpClient;
 
-    public ApiClient(string baseUrl)
+    public ApiClient()
     {
-        _baseUrl = baseUrl;
+        DotEnv.Load();
+        string? addr = Environment.GetEnvironmentVariable("API_ADDRESS");
+        if (string.IsNullOrEmpty(addr))
+        {
+            Console.WriteLine("Відсутня адресса api у .env файлі");
+            Environment.Exit(1);
+        }
+        _baseUrl = addr;
         _httpClient = new HttpClient();
     }
 

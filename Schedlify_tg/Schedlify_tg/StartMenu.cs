@@ -1,6 +1,4 @@
 ﻿using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 public class University
@@ -26,23 +24,15 @@ public class Group
 public class StartMenu
 {
     private readonly ITelegramBotClient _botClient;
-    private readonly List<University> _universities;
-    private readonly List<Department> _departments;
-    private readonly List<Group> _groups;
+    private List<University> _universities;
+    private List<Department> _departments;
+    private List<Group> _groups;
+    private ApiClient _apiClient;
 
     public StartMenu(ITelegramBotClient botClient)
     {
         _botClient = botClient;
-
-        _universities = new List<University>
-        {
-            new University { Name = "ЛНУ1", Id = 1 },
-            new University { Name = "ЛНУ2", Id = 2 },
-            new University { Name = "ЛНУ3", Id = 3 },
-            new University { Name = "ЛНУ4", Id = 4 },
-            new University { Name = "ЛНУ5", Id = 5 },
-        };
-
+        _apiClient = new ApiClient();
         _departments = new List<Department>
         {
             new Department { Name = "ФПМІ11", Id = 1, UniversityId = 1 },
@@ -68,6 +58,7 @@ public class StartMenu
     public async void ShowUniversityChooseList(long userId)
     {
         List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
+        _universities = await _apiClient.GetAsync<List<University>>("/universities", userId);
         foreach (University uni in _universities)
         {
             buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton(uni.Name, $"chosen_university,{uni.Id}") });
@@ -75,5 +66,19 @@ public class StartMenu
         }
 
         await _botClient.SendMessage(userId, "Виберіть університет", replyMarkup: new InlineKeyboardMarkup(buttonList));
+    }
+    public async void ShowDepartmentChooseList(long userId, int universityId)
+    {
+        List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
+        Dictionary<string, string> _params = new Dictionary<string, string>();
+        _params.Add("universityId", $"{universityId}");
+        _departments = await _apiClient.GetAsync<List<Department>>("/departments", userId, _params);
+        foreach (Department dep in _departments)
+        {
+            buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton(dep.Name, $"chosen_department,{dep.Id}") });
+
+        }
+
+        await _botClient.SendMessage(userId, "Виберіть факультет", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
 }

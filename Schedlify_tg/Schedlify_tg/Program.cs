@@ -1,12 +1,9 @@
 ﻿using Telegram.Bot;
-using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
-using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using dotenv.net;
 
-//отримуємо токен
 DotEnv.Load();
 var botToken = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN");
 if (string.IsNullOrEmpty(botToken))
@@ -15,7 +12,6 @@ if (string.IsNullOrEmpty(botToken))
     Environment.Exit(1);
 }
 
-// Створюємо бота
 var botClient = new TelegramBotClient(botToken);
 StartMenu startMenu = new StartMenu(botClient);
 botClient.OnMessage += OnMessage;
@@ -25,9 +21,8 @@ using var cts = new CancellationTokenSource();
 
 var me = await botClient.GetMe();
 Console.WriteLine($"Бот @{me.Username} запущений!");
-Console.ReadLine(); // Блокуючий виклик, щоб бот працював
+Console.ReadLine(); 
 
-// method that handle messages received by the bot:
 async Task OnMessage(Message msg, UpdateType type)
 {
     if (msg.Text == "/start")
@@ -38,10 +33,9 @@ async Task OnMessage(Message msg, UpdateType type)
     }
 }
 
-// method that handle other types of updates received by the bot:
 async Task OnUpdate(Update update)
 {
-    if (update is { CallbackQuery: { } query } and) // non-null CallbackQuery
+    if (update is { CallbackQuery: { } query } and)
     {
         switch (query.Data.Split(',')[0])
         {
@@ -50,11 +44,9 @@ async Task OnUpdate(Update update)
                 break;
 
             case "chosen_university":
-
+                startMenu.ShowDepartmentChooseList(query.From.Id, int.Parse(query.Data.Split(',')[1]));
                 break;
         }
-        //await botClient.AnswerCallbackQuery(query.Id, $"You picked {query.Data}");
-        //await botClient.SendMessage(query.Message!.Chat, $"User {query.From} clicked on {query.Data}");
         await botClient.AnswerCallbackQuery(query.Id);
 
 
