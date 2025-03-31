@@ -52,9 +52,9 @@ async Task OnMessage(Message msg, UpdateType type)
             if (msg.From is not null)
             {
                 TgUser user = await apiClient.PostAsync<TgUser>(
-                "/tgusers/change_subscription_status",
+                "/change_subscription_status",
                 msg.From.Id,
-                new Dictionary<string, object>()
+                null
                 );
                 string message;
                 if (user.Subscribed)
@@ -92,6 +92,10 @@ async Task OnUpdate(Update update)
 
             case "chosen_department":
                 startMenu.ShowGroupChooseList(query.From.Id, int.Parse(query.Data.Split(',')[1]));
+                break;
+
+            case "chosen_group":
+                startMenu.ShowGroupChosen(query.From.Id, int.Parse(query.Data.Split(',')[1]));
                 break;
         }
         await botClient.AnswerCallbackQuery(query.Id,query.Data);
