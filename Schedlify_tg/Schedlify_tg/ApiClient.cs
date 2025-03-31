@@ -8,7 +8,7 @@ public class ApiClient
 
     public ApiClient()
     {
-        DotEnv.Load();
+        DotEnv.Load(new DotEnvOptions(true, new List<string> { "../../../.env" }));
         string? addr = Environment.GetEnvironmentVariable("API_ADDRESS");
         if (string.IsNullOrEmpty(addr))
         {

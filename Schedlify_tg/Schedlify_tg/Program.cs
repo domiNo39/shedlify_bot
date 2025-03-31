@@ -4,7 +4,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using dotenv.net;
 
-DotEnv.Load(new DotEnvOptions(true,new List<string> { "../../../.env"});
+DotEnv.Load(new DotEnvOptions(true,new List<string> { "../../../.env"}));
 var botToken = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN");
 if (string.IsNullOrEmpty(botToken))
 {
