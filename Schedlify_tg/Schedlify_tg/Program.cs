@@ -84,7 +84,9 @@ async Task OnUpdate(Update update)
         switch (query.Data.Split(',')[0])
         {
             case "choose_university":
+
                 startMenu.ShowUniversityChooseList(query.From.Id);
+               
                 break;
 
             case "chosen_university":
@@ -128,9 +130,9 @@ async Task OnUpdate(Update update)
                 startMenu.ShowSchedule(query.From.Id, DateOnly.FromDateTime(DateTime.Now).AddDays(int.Parse(query.Data.Split(',')[1])));
                 break;
         }
+       
         await botClient.AnswerCallbackQuery(query.Id,query.Data);
-
-
+        await botClient.DeleteMessage(query.From.Id, query.Message.MessageId);
     }
 }
 

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -37,6 +38,7 @@ public class StartMenu
             buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton(dep.Name, $"chosen_department,{dep.Id}") });
 
         }
+        buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Назад", $"choose_university") });
 
         await _botClient.SendMessage(userId, "Виберіть факультет", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
@@ -53,6 +55,9 @@ public class StartMenu
 
         }
 
+        University uni = await _apiClient.GetAsync<University>($"/universities/{departmentId}", userId);
+        buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Назад", $"chosen_university,{uni.Id}") });
+
         await _botClient.SendMessage(userId, "Виберіть групу", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
 
@@ -65,6 +70,9 @@ public class StartMenu
         buttonList.Add(new List<InlineKeyboardButton> {
             new InlineKeyboardButton("Підписатись", "subscribe"),
             new InlineKeyboardButton("Переглянути розклад", "show,0")});
+
+        Department dep = await _apiClient.GetAsync<Department>($"/departments/{groupId}", userId, new Dictionary<string, string>());
+        buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Назад", $"chosen_university,{dep.Id}") });
 
         await _botClient.SendMessage(userId, $"Ви обрали групу {group.Name}", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
