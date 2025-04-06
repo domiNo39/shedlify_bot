@@ -32,7 +32,7 @@ async Task OnMessage(Message msg, UpdateType type)
             await botClient.SendMessage(
                 msg.Chat,
                 "Привіт, я чат-бот Schedlify\nЩоб розпочати роботу оберіть вашу групу",
-                replyMarkup: new InlineKeyboardMarkup(new List<InlineKeyboardButton> { new InlineKeyboardButton("Обрати університет", "choose_university") })
+                replyMarkup: new InlineKeyboardMarkup(new List<InlineKeyboardButton> { new InlineKeyboardButton("Обрати університет", "choose_university,0") })
             );
             if (msg.From is not null)
             {
@@ -72,6 +72,13 @@ async Task OnMessage(Message msg, UpdateType type)
             }
             break;
 
+        case "/show_schedule":
+            if (msg.From is not null)
+            {
+                startMenu.ShowSchedule(msg.From.Id, DateOnly.FromDateTime(DateTime.Now));
+
+            }
+            break;
     }
 
 }
@@ -85,7 +92,7 @@ async Task OnUpdate(Update update)
         {
             case "choose_university":
 
-                startMenu.ShowUniversityChooseList(query.From.Id);
+                startMenu.ShowUniversityChooseList(query.From.Id, int.Parse(query.Data.Split(',')[1]));
                
                 break;
 
@@ -128,6 +135,16 @@ async Task OnUpdate(Update update)
             case "show":
 
                 startMenu.ShowSchedule(query.From.Id, DateOnly.FromDateTime(DateTime.Now).AddDays(int.Parse(query.Data.Split(',')[1])));
+                break;
+
+            case "showAssignmentInfo":
+
+                startMenu.ShowAssignmentInfo(query.From.Id, int.Parse(query.Data.Split(',')[1]));
+                break;
+
+            case "hideMessage":
+                await botClient.DeleteMessage(query.From.Id, query.Message.Id);
+               
                 break;
         }
        

@@ -7,6 +7,13 @@ public class StartMenu
 {
     private readonly ITelegramBotClient _botClient;
     private ApiClient _apiClient;
+    private readonly int defaultLimit = 8;
+
+    public Dictionary<Mode, string> Modes = new Dictionary<Mode, string>()
+    {
+        {Mode.Online, "Дистанційно"},
+        {Mode.Offline, "Очно" }
+    };
 
     public StartMenu(ITelegramBotClient botClient)
     {
@@ -15,15 +22,28 @@ public class StartMenu
   
     }
 
-    public async void ShowUniversityChooseList(long userId)
+    public async void ShowUniversityChooseList(long userId, int i)
     {
-        List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
-        List<University> _universities = await _apiClient.GetAsync<List<University>>("/universities", userId);
+        
+        List <List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
+        List<University> _universities = await _apiClient.GetAsync<List<University>>($"/universities?offset={defaultLimit*i}&limit={defaultLimit}", userId);
         foreach (University uni in _universities)
         {
             buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton(uni.Name, $"chosen_university,{uni.Id}") });
 
         }
+
+        List<InlineKeyboardButton> buttonNavigation = new List<InlineKeyboardButton>();
+        if (i > 0)
+        {
+            buttonNavigation.Add(new InlineKeyboardButton("<-", $"choose_university,{i - 1}"));
+        }
+        if ((await _apiClient.GetAsync<List<University>>($"/universities?offset={defaultLimit * (i+1)}&limit={defaultLimit}", userId)).Count > 0)
+        {
+            buttonNavigation.Add(new InlineKeyboardButton("->", $"choose_university,{i + 1}"));
+        }
+        buttonList.Add(buttonNavigation);
+        buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Сховати", "hideMessage") });
 
         await _botClient.SendMessage(userId, "Виберіть університет", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
@@ -38,7 +58,10 @@ public class StartMenu
             buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton(dep.Name, $"chosen_department,{dep.Id}") });
 
         }
-        buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Назад", $"choose_university") });
+        buttonList.Add(new List<InlineKeyboardButton> { 
+            new InlineKeyboardButton("Назад", $"choose_university,0"),
+            new InlineKeyboardButton("Сховати", "hideMessage")
+        });
 
         await _botClient.SendMessage(userId, "Виберіть факультет", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
@@ -55,14 +78,19 @@ public class StartMenu
 
         }
 
-        University uni = await _apiClient.GetAsync<University>($"/universities/{departmentId}", userId);
-        buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Назад", $"chosen_university,{uni.Id}") });
+        //University uni = await _apiClient.GetAsync<University>($"/universities/{departmentId}", userId);
+        //buttonList.Add(new List<InlineKeyboardButton> { 
+        //    new InlineKeyboardButton("Назад", $"chosen_university,{uni.Id}"),
+        //    new InlineKeyboardButton("Сховати", "hideMessage")
+        //});
 
         await _botClient.SendMessage(userId, "Виберіть групу", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
 
     public async void ShowGroupChosen(long userId, int groupId)
     {
+
+
         List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
         
         Group group = await _apiClient.GetAsync<Group>($"/groups/{groupId}", userId);
@@ -71,16 +99,20 @@ public class StartMenu
             new InlineKeyboardButton("Підписатись", "subscribe"),
             new InlineKeyboardButton("Переглянути розклад", "show,0")});
 
-        Department dep = await _apiClient.GetAsync<Department>($"/departments/{groupId}", userId, new Dictionary<string, string>());
-        buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Назад", $"chosen_department,{dep.Id}") });
+        //Department dep = await _apiClient.GetAsync<Department>($"/departments/{groupId}", userId, new Dictionary<string, string>());
+        //buttonList.Add(new List<InlineKeyboardButton> { 
+        //    new InlineKeyboardButton("Назад", $"chosen_department,{dep.Id}"),
+        //    new InlineKeyboardButton("Сховати", "hideMessage")
+        //});
 
+        
         await _botClient.SendMessage(userId, $"Ви обрали групу {group.Name}", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
 
     public async void ShowSchedule(long userId, DateOnly date)
     {
         DateTime dateTime = DateTime.Now;
-        int a = DateOnly.FromDateTime(dateTime).DayNumber - date.DayNumber;
+        int a = date.DayNumber - DateOnly.FromDateTime(dateTime).DayNumber;
         List<Assignment> assignmentList = new List<Assignment>();
         List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
 
@@ -95,7 +127,23 @@ public class StartMenu
             new InlineKeyboardButton("<-", $"show,{a-1}"),
             new InlineKeyboardButton("->", $"show,{a+1}")
         });
+
+        buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Сховати розклад", "hideMessage")});
         await _botClient.SendMessage(userId, $"Розклад на ", replyMarkup: new InlineKeyboardMarkup(buttonList));
+    }
+
+    public async void ShowAssignmentInfo(long userId, int assignmentId)
+    {
+
+        //InlineKeyboardButton buttonNavi = new InlineKeyboardButton("Назад", $"show,{}");
+        string assignmentInfo = "";
+
+        Assignment assignment = await _apiClient.GetAsync<Assignment>($"/assignments/{assignmentId}", userId);
+        assignmentInfo += assignment.StartTime.ToString() + " " + assignment.EndTime.ToString() + "\n\n";
+        //assignmentInfo = 
+        assignmentInfo += assignment.Lecturer.ToString();
+
+        //await _botClient.SendMessage(userId, $"{assignmentInfo}", replyMarkup: new InlineKeyboardButton(buttonNavi));
     }
 }
 
