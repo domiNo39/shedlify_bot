@@ -72,7 +72,7 @@ public class StartMenu
             new InlineKeyboardButton("Переглянути розклад", "show,0")});
 
         Department dep = await _apiClient.GetAsync<Department>($"/departments/{groupId}", userId, new Dictionary<string, string>());
-        buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Назад", $"chosen_university,{dep.Id}") });
+        buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Назад", $"chosen_department,{dep.Id}") });
 
         await _botClient.SendMessage(userId, $"Ви обрали групу {group.Name}", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
