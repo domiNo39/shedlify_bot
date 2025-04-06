@@ -1,8 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-
-public class TgUserBase
+﻿public class TgUserBase
 {
     public string? Username { get; set; }
     public string FirstName { get; set; }
@@ -68,11 +64,15 @@ public class Assignment
 
     public DateOnly? Date { get; set; }
 
-    // Navigation properties
-
 }
 
-public enum ClassType
+public class Class
+{
+    public int Id { get; set; }
+    public int GroupId { get; set; }
+    public string Name { get; set; }
+}
+    public enum ClassType
 {
     Lecture,
     Seminar
@@ -101,4 +101,35 @@ public enum AssignmentType
     Regular,
     Even,
     Odd
+}
+
+public class Dicts
+{
+    public static readonly Dictionary<Mode, string> Modes = new Dictionary<Mode, string>()
+    {
+        {Mode.Online, "Дистанційно"},
+        {Mode.Offline, "Очно" }
+    };
+    public static readonly Dictionary<Weekday, string> WeekDays = new Dictionary<Weekday, string>()
+    {
+        {Weekday.Monday, "Понеділок" },
+        {Weekday.Tuesday, "Вівторок" },
+        {Weekday.Wednesday,"Середа" },
+        {Weekday.Thursday, "Четвер" },
+        {Weekday.Friday, "П'ятниця" },
+        {Weekday.Sunday, "Субота" },
+        {Weekday.Sunday, "Неділя" }
+    };
+    public static readonly Dictionary<ClassType, string> ClassTypes = new Dictionary<ClassType, string>()
+    {
+        {ClassType.Lecture, "Лекція" },
+        {ClassType.Seminar, "Практична" }
+    };
+    public static readonly Dictionary<AssignmentType, string> AssignmentTypes = new Dictionary<AssignmentType, string>()
+    {
+        {AssignmentType.Special, "Одноразова"},
+        {AssignmentType.Regular, "Регулярна"},
+        {AssignmentType.Odd, "Періодична"},
+        {AssignmentType.Even, "Періодична"}
+    };
 }

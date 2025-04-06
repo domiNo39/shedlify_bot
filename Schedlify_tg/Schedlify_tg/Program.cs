@@ -97,11 +97,11 @@ async Task OnUpdate(Update update)
                 break;
 
             case "chosen_university":
-                startMenu.ShowDepartmentChooseList(query.From.Id, int.Parse(query.Data.Split(',')[1]));
+                startMenu.ShowDepartmentChooseList(query.From.Id, int.Parse(query.Data.Split(',')[1]), int.Parse(query.Data.Split(',')[2]));
                 break;
 
             case "chosen_department":
-                startMenu.ShowGroupChooseList(query.From.Id, int.Parse(query.Data.Split(',')[1]));
+                startMenu.ShowGroupChooseList(query.From.Id, int.Parse(query.Data.Split(',')[1]), int.Parse(query.Data.Split(',')[2]));
                 break;
 
             case "chosen_group":
