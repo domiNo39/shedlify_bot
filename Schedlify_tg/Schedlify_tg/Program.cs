@@ -87,6 +87,8 @@ async Task OnUpdate(Update update)
 {
     if (update is { CallbackQuery: { } query } and)
     {
+        await botClient.AnswerCallbackQuery(query.Id, query.Data);
+
         ApiClient apiClient = new ApiClient();
         switch (query.Data.Split(',')[0])
         {
@@ -139,7 +141,7 @@ async Task OnUpdate(Update update)
 
             case "showAssignmentInfo":
 
-                startMenu.ShowAssignmentInfo(query.From.Id, int.Parse(query.Data.Split(',')[1]));
+                startMenu.ShowAssignmentInfo(query.From.Id, int.Parse(query.Data.Split(',')[1]), int.Parse(query.Data.Split(',')[2]));
                 break;
 
             case "hideMessage":
@@ -148,7 +150,7 @@ async Task OnUpdate(Update update)
                 break;
         }
        
-        await botClient.AnswerCallbackQuery(query.Id,query.Data);
+        
         await botClient.DeleteMessage(query.From.Id, query.Message.MessageId);
     }
 }

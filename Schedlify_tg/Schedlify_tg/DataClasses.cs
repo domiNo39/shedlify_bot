@@ -117,7 +117,7 @@ public class Dicts
         {Weekday.Wednesday,"Середа" },
         {Weekday.Thursday, "Четвер" },
         {Weekday.Friday, "П'ятниця" },
-        {Weekday.Sunday, "Субота" },
+        {Weekday.Saturday, "Субота" },
         {Weekday.Sunday, "Неділя" }
     };
     public static readonly Dictionary<ClassType, string> ClassTypes = new Dictionary<ClassType, string>()

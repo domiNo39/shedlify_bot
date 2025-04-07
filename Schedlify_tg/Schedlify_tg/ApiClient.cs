@@ -33,6 +33,7 @@ public class ApiClient
         }
         else
         {
+            var content = await response.Content.ReadAsStringAsync();
             throw new ApiException(response.StatusCode, await response.Content.ReadAsStringAsync());
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public class StartMenu
 {
@@ -86,7 +87,7 @@ public class StartMenu
         List<Group> _groups = await _apiClient.GetAsync<List<Group>>($"/groups", userId, _params);
         foreach (Group group in _groups)
         {
-            buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton(group.Name, $"chosen_group,0,{group.Id}") });
+            buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton(group.Name, $"chosen_group,{group.Id}") });
 
         }
         List<InlineKeyboardButton> buttonNavigation = new List<InlineKeyboardButton>();
@@ -143,12 +144,17 @@ public class StartMenu
                 replyMarkup: new InlineKeyboardMarkup(new List<InlineKeyboardButton> { new InlineKeyboardButton("Обрати університет", "choose_university,0") })
             );
         }
-        List<Assignment> assignmentList = new List<Assignment>();
+
+        Dictionary<string, string> _params = new Dictionary<string, string>();
+        _params.Add("groupId", $"{user.GroupId}");
+        _params.Add("date", $"{date.ToString()}");
+        List<Assignment> assignmentList = await _apiClient.GetAsync<List<Assignment>>($"/assignments/by_group_id_and_date", userId, _params);
+        
         List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
 
         foreach (Assignment assignment in assignmentList)
         {
-            buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton($"{assignment.StartTime}: {assignment.ClassId}", $"show,{assignment.Id}") });
+            buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton($"{assignment.StartTime}: {(await _apiClient.GetAsync<Class>($"/classes/{assignment.ClassId}", userId)).Name}", $"showAssignmentInfo,{a},{assignment.Id}") });
 
         }
 
@@ -159,13 +165,15 @@ public class StartMenu
         });
 
         buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Сховати розклад", "hideMessage")});
-        await _botClient.SendMessage(userId, $"Розклад на ", replyMarkup: new InlineKeyboardMarkup(buttonList));
+        await _botClient.SendMessage(userId, $"Розклад на {date.ToString()}", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
 
     public async void ShowAssignmentInfo(long userId, int i, int assignmentId)
     {
 
-        InlineKeyboardButton buttonNavi = new InlineKeyboardButton("Назад", $"show,{i}");
+       
+        List<InlineKeyboardButton> buttonList = new List<InlineKeyboardButton> { new InlineKeyboardButton("Назад", $"show,{i}") };
+      
         string assignmentInfo = "";
 
         Assignment assignment = await _apiClient.GetAsync<Assignment>($"/assignments/{assignmentId}", userId);
@@ -189,6 +197,8 @@ public class StartMenu
             assignmentInfo += $"<b>Адреса:</b> {address}\n";
         }
         assignmentInfo += $"\n{Dicts.AssignmentTypes[assignment.Type]}";
+
+        await _botClient.SendMessage(userId, assignmentInfo, replyMarkup: new InlineKeyboardMarkup(buttonList), parseMode:Telegram.Bot.Types.Enums.ParseMode.Html);
     }
 }
 
