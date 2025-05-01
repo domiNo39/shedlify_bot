@@ -100,11 +100,11 @@ public class StartMenu
         {
             buttonNavigation.Add(new InlineKeyboardButton("->", $"chosen_department,{i + 1},{departmentId}"));
         }
-        //University uni = await _apiClient.GetAsync<University>($"/universities/{departmentId}", userId);
-        //buttonList.Add(new List<InlineKeyboardButton> { 
-        //    new InlineKeyboardButton("Назад", $"chosen_university,0,{uni.Id}"),
-        //    new InlineKeyboardButton("Сховати", "hideMessage")
-        //});
+        University uni = await _apiClient.GetAsync<University>($"/universities/{departmentId}", userId);
+        buttonList.Add(new List<InlineKeyboardButton> {
+            new InlineKeyboardButton("Назад", $"chosen_university,0,{uni.Id}"),
+            new InlineKeyboardButton("Сховати", "hideMessage")
+        });
 
         await _botClient.SendMessage(userId, "Виберіть групу", replyMarkup: new InlineKeyboardMarkup(buttonList));
     }
@@ -121,11 +121,11 @@ public class StartMenu
             new InlineKeyboardButton("Підписатись", "subscribe"),
             new InlineKeyboardButton("Переглянути розклад", "show,0")});
 
-        //Department dep = await _apiClient.GetAsync<Department>($"/departments/{groupId}", userId, new Dictionary<string, string>());
-        //buttonList.Add(new List<InlineKeyboardButton> { 
-        //    new InlineKeyboardButton("Назад", $"chosen_department,0,{dep.Id}"),
-        //    new InlineKeyboardButton("Сховати", "hideMessage")
-        //});
+        Department dep = await _apiClient.GetAsync<Department>($"/departments/{groupId}", userId, new Dictionary<string, string>());
+        buttonList.Add(new List<InlineKeyboardButton> {
+            new InlineKeyboardButton("Назад", $"chosen_department,0,{dep.Id}"),
+            new InlineKeyboardButton("Сховати", "hideMessage")
+        });
 
 
         await _botClient.SendMessage(userId, $"Ви обрали групу {group.Name}", replyMarkup: new InlineKeyboardMarkup(buttonList));
@@ -134,6 +134,7 @@ public class StartMenu
     public async void ShowSchedule(long userId, DateOnly date)
     {
         DateTime dateTime = DateTime.Now;
+        
         int a = date.DayNumber - DateOnly.FromDateTime(dateTime).DayNumber;
         TgUser user = await _apiClient.GetAsync<TgUser>("/tgusers", userId);
         if (user == null || user.GroupId == null)
@@ -158,10 +159,22 @@ public class StartMenu
 
         }
 
+        int b = 1;
+        int c = 1;
+        if (date.DayOfWeek == DayOfWeek.Monday)
+        {
+            b = 2;
+        }
+        if(date.DayOfWeek == DayOfWeek.Saturday)
+        {
+            c = 2;
+        }
+
         buttonList.Add(new List<InlineKeyboardButton>
         {
-            new InlineKeyboardButton("<-", $"show,{a-1}"),
-            new InlineKeyboardButton("->", $"show,{a+1}")
+
+            new InlineKeyboardButton("<-", $"show,{a-b}"),
+            new InlineKeyboardButton("->", $"show,{a+c}")
         });
 
         buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("Сховати розклад", "hideMessage")});
