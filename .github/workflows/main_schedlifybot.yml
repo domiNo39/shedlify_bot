@@ -24,12 +24,12 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run:
+        run:  |
           cd Schedlify_tg/Schedlify_tg
           dotnet build --configuration Release
 
       - name: dotnet publish
-        run:
+        run:  |
           cd Schedlify_tg/Schedlify_tg
           dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
