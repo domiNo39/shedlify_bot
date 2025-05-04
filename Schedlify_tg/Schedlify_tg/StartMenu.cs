@@ -148,7 +148,7 @@ public class StartMenu
 
         Dictionary<string, string> _params = new Dictionary<string, string>();
         _params.Add("groupId", $"{user.GroupId}");
-        _params.Add("date", $"{date.ToString()}");
+        _params.Add("date", $"{date.ToString("yyyy-MM-dd")}");
         List<Assignment> assignmentList = await _apiClient.GetAsync<List<Assignment>>($"/assignments/by_group_id_and_date", userId, _params);
         
         List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
