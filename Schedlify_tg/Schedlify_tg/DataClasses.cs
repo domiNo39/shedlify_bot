@@ -132,4 +132,19 @@ public class Dicts
         {AssignmentType.Odd, "Періодична"},
         {AssignmentType.Even, "Періодична"}
     };
+    public static readonly Dictionary<int, string> Months = new Dictionary<int, string>()
+    {
+        {1, "січня"},
+        {2, "лютого"},
+        {3, "березня"},
+        {4, "квітня"},
+        {5, "травня"},
+        {6, "червня"},
+        {7, "липня"},
+        {8, "серпня"},
+        {9, "вересня"},
+        {10, "жовтня"},
+        {11, "листопада"},
+        {12, "грудня"}
+    };
 }

@@ -25,14 +25,25 @@ Console.ReadLine();
 
 async Task OnMessage(Message msg, UpdateType type)
 {
+    string welcomeText =
+@"🎓 Привіт! Це Schedlify — твій особистий гід у світі університетських розкладів!
+
+Ми створили цього бота, щоб зробити твоє студентське життя трішки простішим:
+✅ знаходь розклад за секунди
+✅ отримуй сповіщення про пари й зміни
+✅ обирай групу, яка тобі потрібна
+
+А тепер зроби перший крок 🎯
+👇 Натисни кнопку нижче щоб знайти свою групу:";
+
     ApiClient apiClient = new ApiClient();
     switch (msg.Text)
     {
         case "/start":
             await botClient.SendMessage(
                 msg.Chat,
-                "Привіт, я чат-бот Schedlify\nЩоб розпочати роботу оберіть вашу групу",
-                replyMarkup: new InlineKeyboardMarkup(new List<InlineKeyboardButton> { new InlineKeyboardButton("Обрати університет", "choose_university,0") })
+                welcomeText,
+                replyMarkup: new InlineKeyboardMarkup(new List<InlineKeyboardButton> { new InlineKeyboardButton("🔘 Виберіть ваш університет", "choose_university,0") })
             );
             if (msg.From is not null)
             {
