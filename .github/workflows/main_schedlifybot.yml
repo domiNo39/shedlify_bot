@@ -64,6 +64,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
+          path: artifact
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -78,5 +79,5 @@ jobs:
         with:
           app-name: 'schedlifybot'
           slot-name: 'Production'
-          package: publish
+          package: ./artifact
           
