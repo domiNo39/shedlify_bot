@@ -154,7 +154,7 @@ public class StartMenu
 
     public async void ShowSchedule(long userId, DateOnly date)
     {
-        DateTime dateTime = DateTime.Now;
+        DateTime dateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time"));
         
         int a = date.DayNumber - DateOnly.FromDateTime(dateTime).DayNumber;
         TgUser user = await _apiClient.GetAsync<TgUser>("/tgusers", userId);
@@ -219,7 +219,7 @@ public class StartMenu
 
         Assignment assignment = await _apiClient.GetAsync<Assignment>($"/assignments/{assignmentId}", userId);
         Class _class = await _apiClient.GetAsync<Class>($"/classes/{assignment.ClassId}",userId);
-        assignmentInfo += $"🕒 Час початку: {assignment.StartTime.ToShortTimeString()}\n";
+        assignmentInfo += $"🕒 Початок: {assignment.StartTime.ToShortTimeString()}\n";
         assignmentInfo += $"<b>📚 Предмет:</b> {_class.Name}\n\n";
         if (assignment.Mode is Mode mode)
         {
@@ -227,12 +227,11 @@ public class StartMenu
         }
         if (assignment.RoomNumber is string room)
         {
-            assignmentInfo += "<b>🏛️ Місце проведення:</b>\n";
-            assignmentInfo += $"    <b>🏫 Аудиторія:</b> {room}\n";
+            assignmentInfo += $"<b>🏫 Аудиторія:</b> {room}\n";
         }
         if (assignment.Address is string address)
         {
-            assignmentInfo += $"    <b>📍Адреса:</b> <i>{address}</i>\n";
+            assignmentInfo += $"<b>📍 Адреса:</b> <i>{address}</i>\n";
         }
         if (assignment.ClassType is ClassType classType)
         {

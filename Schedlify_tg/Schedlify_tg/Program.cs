@@ -21,7 +21,15 @@ using var cts = new CancellationTokenSource();
 
 var me = await botClient.GetMe();
 Console.WriteLine($"Бот @{me.Username} запущений!");
-Console.ReadLine();
+string? text = "";
+while (text.ToLower() != "exit")
+{
+    text = Console.ReadLine();
+    if (text is null)
+    {
+        text = "";
+    }
+}
 
 async Task OnMessage(Message msg, UpdateType type)
 {
@@ -76,9 +84,12 @@ async Task OnMessage(Message msg, UpdateType type)
                 {
                     message = "Ви успішно відписались";
                 }
+                List<List<InlineKeyboardButton>> buttonList = new List<List<InlineKeyboardButton>>();
+                buttonList.Add(new List<InlineKeyboardButton> { new InlineKeyboardButton("🔽Приховати", "hideMessage") });
                 await botClient.SendMessage(
                     msg.Chat,
-                    message
+                    message,
+                    replyMarkup: new InlineKeyboardMarkup(buttonList)
                 );
             }
             break;
@@ -86,7 +97,7 @@ async Task OnMessage(Message msg, UpdateType type)
         case "/show_schedule":
             if (msg.From is not null)
             {
-                startMenu.ShowSchedule(msg.From.Id, DateOnly.FromDateTime(DateTime.Now));
+                startMenu.ShowSchedule(msg.From.Id, DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time"))));
 
             }
             break;
@@ -147,7 +158,7 @@ async Task OnUpdate(Update update)
 
             case "show":
 
-                startMenu.ShowSchedule(query.From.Id, DateOnly.FromDateTime(DateTime.Now).AddDays(int.Parse(query.Data.Split(',')[1])));
+                startMenu.ShowSchedule(query.From.Id, DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time"))).AddDays(int.Parse(query.Data.Split(',')[1])));
                 break;
 
             case "showAssignmentInfo":
